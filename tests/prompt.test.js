@@ -4,13 +4,13 @@ import {AUTO,CUSTOM,exampleNotes,fields,creativeIds} from '../config.js';
 import {freshState,normalizeState,buildPrompt,validate,valueOf,scenePhases} from '../prompt.js';
 const validState=()=>{const s=freshState();s.values.notes=exampleNotes;return s;};
 
-test('original master prompt preserves required scenes, language and educational facts',()=>{
-  const s=validState(),p=buildPrompt(s);
+test('original master prompt preserves required scenes, language and video structure',()=>{
+  const s=freshState(),p=buildPrompt(s);
   assert.equal(validate(s).length,0);
   assert.match(p,/Hasilkan tepat 4 babak/);assert.match(p,/Jumlah tempoh: 24 saat/);
   assert.match(p,/Dialog Bahasa Melayu Malaysia:/);assert.match(p,/Nisbah aspek: 16:9/);
-  assert.match(p,/Jangan gunakan jadual/);assert.match(p,/jangan mereka kod DSKP/i);
-  assert.ok(p.includes(exampleNotes));assert.equal((p.match(/• Babak \d+ —/g)||[]).length,4);
+  assert.match(p,/Jangan gunakan jadual/);
+  assert.equal((p.match(/• Babak \d+ —/g)||[]).length,4);
   assert.match(p,/maksimum 12 perkataan/);
 });
 
@@ -40,8 +40,9 @@ test('custom values and scene overrides reach prompt without placeholders',()=>{
   const p=buildPrompt(s);assert.equal(validate(s).length,0);assert.ok(p.includes('Kebun pintar sekolah'));assert.ok(p.includes('Nisbah aspek: 3:2'));assert.ok(p.includes('Kenal pasti masalah'));assert.ok(p.includes('Kamera khusus: Zum masuk perlahan'));assert.ok(p.includes('Aksi khusus: Sara menyentuh skrin'));assert.ok(!p.includes('__custom__'));
 });
 
-test('validation rejects missing notes, invalid custom ratios and out-of-range durations',()=>{
-  let s=freshState();assert.equal(validate(s)[0].id,'notes');s=validState();s.values.scene_count=13;s.values.scene_duration=3;assert.equal(validate(s).length,2);
+test('validation rejects invalid custom ratios and out-of-range durations',()=>{
+  let s=freshState();assert.equal(validate(s).length,0);
+  s=validState();s.values.scene_count=13;s.values.scene_duration=3;assert.equal(validate(s).length,2);
   s=validState();s.values.aspect_ratio=CUSTOM;s.custom.aspect_ratio='0:9';assert.ok(validate(s).some(e=>e.message.includes('sifar')));
   s.custom.aspect_ratio='lebar';assert.ok(validate(s).length);s.custom.aspect_ratio='9:16';assert.equal(validate(s).length,0);
   s.values.visual_style=CUSTOM;assert.ok(validate(s).some(e=>e.id==='custom_visual_style'));
@@ -51,7 +52,7 @@ test('language selection changes dialogue labels without contradictory Malay man
   const s=validState();s.values.language='Bahasa Inggeris';let p=buildPrompt(s);
   assert.ok(p.includes('Dialog Bahasa Inggeris:'));assert.ok(!p.includes('Tulis seluruh cerita, papan cerita, penerangan visual dan dialog dalam Bahasa Melayu Malaysia'));
   s.values.language='Dwibahasa BM–BI';p=buildPrompt(s);assert.ok(p.includes('Pilih satu bahasa audio bagi setiap versi video'));
-  s.values.language=AUTO;assert.ok(buildPrompt(s).includes('Pilih satu bahasa yang sesuai dengan nota'));
+  s.values.language=AUTO;assert.ok(buildPrompt(s).includes('Pilih satu bahasa yang sesuai dengan jalan cerita'));
 });
 
 test('JSON round trip preserves notes, custom fields and scene overrides',()=>{
@@ -70,7 +71,7 @@ test('Auto configuration and custom output still request complete structured out
 });
 
 test('creative randomization scope excludes content, characters and structure',()=>{
-  const protectedIds=['subject','education_level','main_character','character_group','world_setting','scene_count','scene_duration','aspect_ratio','notes','learning_objective'];
+  const protectedIds=['main_character','character_group','world_setting','scene_count','scene_duration','aspect_ratio'];
   protectedIds.forEach(id=>assert.ok(!creativeIds.includes(id)));creativeIds.forEach(id=>assert.ok(fields.some(f=>f.id===id)));
 });
 

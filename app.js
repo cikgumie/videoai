@@ -1,4 +1,4 @@
-import {AUTO,CUSTOM,groups,fields,defaults,presets,creativeIds,exampleNotes} from './config.js';
+import {AUTO,CUSTOM,groups,fields,defaults,presets,creativeIds} from './config.js';
 import {freshState,normalizeState,valueOf,buildPrompt,validate,scenePhases} from './prompt.js';
 
 const $=id=>document.getElementById(id);
@@ -37,12 +37,11 @@ function addText(container,id,label,options={}) {
   if(options.multiline)input.rows=options.rows||3;
   if(options.required){input.required=true;input.setAttribute('aria-required','true');}
   if(options.numeric){input.min=options.min;input.max=options.max;input.step=1;}
-  else input.maxLength=id==='notes'?50000:options.multiline?5000:1000;
+  else input.maxLength=options.multiline?5000:1000;
   input.addEventListener('input',()=>{
     state.values[id]=options.numeric?(input.value===''?'':Number(input.value)):input.value;
     clearErrors();changed();
     if(id==='scene_count'||id==='scene_duration')renderOverrides();
-    if(id==='notes')$('notesCount').textContent=`${input.value.length.toLocaleString('ms-MY')} / 50,000 aksara`;
   });
   wrap.append(input);
   if(options.hint){const hint=el('p','field-hint',options.hint);hint.id=`${id}_hint`;wrap.append(hint);input.setAttribute('aria-describedby',hint.id);}
@@ -63,23 +62,12 @@ function renderForm() {
   groups.forEach((g,i)=>{
     const panel=el('section','settings-panel');panel.id=`panel-${g.id}`;panel.hidden=i!==currentGroup;
     const grid=el('div','fields-grid');panel.append(grid);
-    if(g.id==='education') {
-      addText(grid,'title','Tajuk projek',{full:true,placeholder:'Contoh: Misi Pemikiran Komputasional'});
-      const notes=addText(grid,'notes','Nota pengajaran',{multiline:true,rows:7,full:true,required:true,placeholder:'Tampal nota, konsep utama, fakta dan contoh yang perlu dimasukkan dalam cerita.'});
-      const meta=el('div','notes-meta');const sample=el('button','text-button','Gunakan nota contoh');sample.type='button';sample.id='sampleBtn';sample.addEventListener('click',()=>{state.values.notes=exampleNotes;$('notes').value=exampleNotes;$('notesCount').textContent=`${exampleNotes.length.toLocaleString('ms-MY')} / 50,000 aksara`;clearErrors();changed();toast('Nota contoh pemikiran komputasional dimasukkan.');});
-      const count=el('span','',`${state.values.notes.length.toLocaleString('ms-MY')} / 50,000 aksara`);count.id='notesCount';meta.append(sample,count);notes.append(meta);
-    }
     if(g.id==='story') {
+      addText(grid,'title','Tajuk projek (pilihan)',{full:true,placeholder:'Contoh: Misi Pemikiran Komputasional'});
       addText(grid,'scene_count','Bilangan babak',{numeric:true,min:2,max:12,hint:'2–12 babak. Asal: 4 babak.'});
       addText(grid,'scene_duration','Tempoh setiap babak (saat)',{numeric:true,min:4,max:30,hint:'4–30 saat. Asal: 6 saat.'});
     }
     g.fields.forEach(f=>addSelect(grid,f));
-    if(g.id==='education') {
-      addText(grid,'learning_objective','Objektif pembelajaran',{multiline:true,full:true,placeholder:'Pada akhir pembelajaran, murid dapat…'});
-      const details=el('details','standard-details');details.append(el('summary','','Rujukan DSKP (pilihan)'));
-      const inner=el('div','fields-grid');addText(inner,'content_standard','Standard Kandungan',{placeholder:'Masukkan kod dan pernyataan SK'});addText(inner,'learning_standard','Standard Pembelajaran',{placeholder:'Masukkan kod dan pernyataan SP'});
-      details.append(el('p','field-hint','Gunakan standard daripada DSKP anda. Biarkan kosong jika tiada rujukan.'),inner);grid.append(details);
-    }
     if(g.id==='world')addText(grid,'character_notes','Butiran watak (pilihan)',{multiline:true,full:true,placeholder:'Contoh: Cikgu Amir, jaket kelabu; Sara, tudung ungu; Danial, rambut pendek. Kekalkan pakaian dan wajah.'});
     if(g.id==='output')addText(grid,'extra_instructions','Arahan tambahan (pilihan)',{multiline:true,full:true,placeholder:'Contoh: Elakkan adegan berbahaya. Gunakan contoh daripada kehidupan sekolah.'});
     $('panels').append(panel);
@@ -111,7 +99,8 @@ function setGroup(index,scroll=true) {
   document.querySelectorAll('.nav-item').forEach((b,i)=>{b.classList.toggle('active',i===currentGroup);if(i===currentGroup)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
   $('settingsTitle').textContent=groups[currentGroup]?.label||'Tetapan setiap babak';
   $('groupDescription').textContent=groups[currentGroup]?.description||'Perincikan fokus dan aksi bagi setiap babak secara berasingan.';
-  $('stepLabel').textContent=`LANGKAH ${String(currentGroup+1).padStart(2,'0')} / 08`;
+  const total=groups.length+1;
+  $('stepLabel').textContent=`LANGKAH ${String(currentGroup+1).padStart(2,'0')} / ${String(total).padStart(2,'0')}`;
   $('prevBtn').disabled=currentGroup===0;$('nextBtn').hidden=currentGroup===groups.length;
   if(scroll&&window.innerWidth<1000)document.querySelector('.settings-card').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -119,10 +108,9 @@ function renderPresets() {
   $('presets').replaceChildren();presets.forEach((p,i)=>{
     const button=el('button',`preset preset-${i}`);button.type='button';button.dataset.preset=p.id;button.setAttribute('aria-pressed','false');const glyph=el('span','preset-icon');glyph.append(icon([4,0,2,1][i]));const copy=el('span','preset-copy');copy.append(el('strong','',p.label),el('small','',p.description));button.append(glyph,copy,el('span','preset-check','✓'));
     button.addEventListener('click',()=>{
-      const preserved=Object.fromEntries(['title','notes','learning_objective','content_standard','learning_standard','character_notes','extra_instructions',...groups[0].fields.map(f=>f.id)].map(id=>[id,state.values[id]]));
-      state.values={...defaults,...p.values,...preserved};if(!state.values.notes && p.values.subject)state.values.subject=p.values.subject;
-      // Retain custom educational values and per-scene work when changing creative presets.
-      state.activePreset=p.id;renderForm();markPreset();clearErrors();updatePreview();save();toast(`Preset ${p.label} digunakan. Nota dan rujukan pendidikan dikekalkan.`);
+      const preserved=Object.fromEntries(['title','character_notes','extra_instructions'].map(id=>[id,state.values[id]]));
+      state.values={...defaults,...p.values,...preserved};
+      state.activePreset=p.id;renderForm();markPreset();clearErrors();updatePreview();save();toast(`Preset ${p.label} digunakan.`);
     });$('presets').append(button);
   });markPreset();
 }
@@ -171,7 +159,7 @@ $('importFile').addEventListener('change',async e=>{
   catch(error){toast(error instanceof SyntaxError?'Format JSON tidak sah. Pilih fail eksport VideoAI.':error.message);}
   finally {e.target.value='';}
 });
-$('randomBtn').addEventListener('click',()=>{creativeIds.forEach(id=>{const f=fields.find(f=>f.id===id);state.values[id]=f.values[Math.floor(Math.random()*f.values.length)];});state.activePreset='';renderForm();markPreset();updatePreview();save();toast('Gaya kreatif dirawakkan. Nota, watak dan struktur video dikekalkan.');});
+$('randomBtn').addEventListener('click',()=>{creativeIds.forEach(id=>{const f=fields.find(f=>f.id===id);state.values[id]=f.values[Math.floor(Math.random()*f.values.length)];});state.activePreset='';renderForm();markPreset();updatePreview();save();toast('Gaya kreatif dirawakkan. Watak dan struktur video dikekalkan.');});
 $('resetBtn').addEventListener('click',()=>$('resetDialog').showModal());$('cancelReset').addEventListener('click',()=>$('resetDialog').close());
 $('confirmReset').addEventListener('click',()=>{state=freshState();currentGroup=0;renderForm();markPreset();clearErrors();updatePreview();save();$('resetDialog').close();toast('Tetapan asal dipulihkan.');});
 

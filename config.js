@@ -2,13 +2,6 @@ export const AUTO = 'Auto / Cadangan AI';
 export const CUSTOM = '__custom__';
 const f = (id, label, values, initial = values[0]) => ({id, label, values, initial});
 export const groups = [
-  {id:'education', label:'Kandungan pendidikan', short:'Kandungan', description:'Mulakan dengan nota dan hasil pembelajaran yang ingin disampaikan.', fields:[
-    f('subject','Mata pelajaran',['Asas Sains Komputer','Sains','Matematik','Sejarah','Geografi','Pendidikan Islam','Pendidikan Moral','Bahasa Melayu','Bahasa Inggeris','Reka Bentuk dan Teknologi','Umum']),
-    f('education_level','Tahun / tingkatan',[...Array.from({length:6},(_,i)=>`Tahun ${i+1}`),...Array.from({length:5},(_,i)=>`Tingkatan ${i+1}`)],'Tingkatan 1'),
-    f('content_focus','Fokus kandungan',['Pengenalan konsep','Penerangan konsep','Demonstrasi','Penyelesaian masalah','Eksperimen','Simulasi','Kajian kes','Pengukuhan','Rumusan','Penilaian']),
-    f('bloom_level','Tahap kognitif',['Mengingat','Memahami','Mengaplikasi','Menganalisis','Menilai','Mencipta','Campuran'],'Memahami'),
-    f('learning_approach','Pendekatan pembelajaran',['Penceritaan','Pembelajaran berasaskan masalah','Pembelajaran berasaskan projek','Inkuiri','Demonstrasi','Eksplorasi','Perbincangan','Gamifikasi','Simulasi dunia sebenar'])
-  ]},
   {id:'story',label:'Cerita & struktur video',short:'Cerita',description:'Tentukan aliran cerita, tempoh dan format skrin.',fields:[
     f('story_structure','Jenis naratif',['Masalah → Penyelesaian','Soalan → Penemuan','Misi → Cabaran → Kejayaan','Kesilapan → Pembetulan','Eksperimen → Pemerhatian → Kesimpulan','Misteri → Petunjuk → Jawapan','Situasi sebenar → Analisis → Pengajaran','Pengembaraan pendidikan']),
     f('story_tone','Nada cerita',['Ilmiah','Inspirasi','Serius','Santai','Penuh rasa ingin tahu','Misteri','Pengembaraan','Dramatik ringan','Futuristik']),
@@ -66,11 +59,11 @@ export const groups = [
 ];
 export const fields = groups.flatMap(g=>g.fields);
 export const defaults = Object.fromEntries(fields.map(f=>[f.id,f.initial]));
-Object.assign(defaults,{title:'',notes:'',learning_objective:'',content_standard:'',learning_standard:'',character_notes:'',scene_count:4,scene_duration:6,extra_instructions:''});
+Object.assign(defaults,{title:'',notes:'',character_notes:'',scene_count:4,scene_duration:6,extra_instructions:''});
 export const presets = [
   {id:'futuristic',label:'Anime futuristik',description:'Hologram · guru & murid',values:{}},
-  {id:'lab',label:'Eksperimen sains',description:'Makmal · inkuiri',values:{subject:'Sains',world_setting:'Makmal sains',technology_level:'Moden',visual_style:'Animasi 3D',color_palette:'Cerah pendidikan',teacher_design:'Saintis',student_design:'Pakaian makmal',character_action:'Membuat eksperimen',learning_approach:'Inkuiri',story_structure:'Eksperimen → Pemerhatian → Kesimpulan',scene_pattern:'Soalan → Eksperimen → Hasil → Kesimpulan',lighting:'Cahaya terang pendidikan',background_music:'Inspirasi',sound_effect:'Makmal',transition_style:'Potongan terus'}},
-  {id:'history',label:'Misi sejarah',description:'Muzium · penemuan',values:{subject:'Sejarah',world_setting:'Dunia sejarah',scene_location:'Muzium',technology_level:'Semasa',visual_style:'Anime realistik',color_palette:'Warna hangat',teacher_design:'Profesional',character_action:'Menunjukkan objek',story_tone:'Pengembaraan',story_structure:'Misteri → Petunjuk → Jawapan',lighting:'Cahaya senja keemasan',background_music:'Pengembaraan',sound_effect:'Minimum',transition_style:'Larut silang'}},
+  {id:'lab',label:'Eksperimen sains',description:'Makmal · inkuiri',values:{world_setting:'Makmal sains',technology_level:'Moden',visual_style:'Animasi 3D',color_palette:'Cerah pendidikan',teacher_design:'Saintis',student_design:'Pakaian makmal',character_action:'Membuat eksperimen',story_structure:'Eksperimen → Pemerhatian → Kesimpulan',scene_pattern:'Soalan → Eksperimen → Hasil → Kesimpulan',lighting:'Cahaya terang pendidikan',background_music:'Inspirasi',sound_effect:'Makmal',transition_style:'Potongan terus'}},
+  {id:'history',label:'Misi sejarah',description:'Muzium · penemuan',values:{world_setting:'Dunia sejarah',scene_location:'Muzium',technology_level:'Semasa',visual_style:'Anime realistik',color_palette:'Warna hangat',teacher_design:'Profesional',character_action:'Menunjukkan objek',story_tone:'Pengembaraan',story_structure:'Misteri → Petunjuk → Jawapan',lighting:'Cahaya senja keemasan',background_music:'Pengembaraan',sound_effect:'Minimum',transition_style:'Larut silang'}},
   {id:'short',label:'Video ringkas',description:'Menegak · 3 babak',values:{aspect_ratio:'9:16',scene_count:3,scene_duration:8,visual_style:'Animasi 2D',color_palette:'Warna pastel',world_setting:'Sekolah moden',technology_level:'Moden',teacher_design:'Guru moden',character_action:'Berdiri dan menerangkan',dialog_density:'Sangat ringkas',onscreen_text:'Kata kunci',transition_style:'Potongan terus'}}
 ];
 export const creativeIds = ['color_palette','visual_mood','lighting','lighting_intensity','shot_type','camera_angle','camera_movement','camera_speed','transition_style','background_music'];
