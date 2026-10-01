@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a32">
+  <meta name="description" content="Bina master prompt papan cerita video pendidikan. Sesuaikan nota, watak, visual, kamera dan dialog Bahasa Melayu Malaysia.">
+  <title>VideoAI Studio — Pembina Prompt Pendidikan</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Langkau ke kandungan</a>
+  <aside class="sidebar">
+    <a class="brand" href="./" aria-label="VideoAI Studio"><span class="brand-symbol" aria-hidden="true">V<span></span></span><span>VideoAI<small>STUDIO PENDIDIKAN</small></span></a>
+    <div class="workspace-label">RUANG KREATIF</div>
+    <nav id="navigation" aria-label="Tetapan prompt"></nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-note"><span class="tiny-dot"></span> Daripada nota kepada cerita<p>Rancang visual. Bina prompt.<br>Hidupkan pembelajaran.</p></div>
+      <a href="https://github.com/cikgumie/videoai" target="_blank" rel="noopener noreferrer" class="repository-link">Kod sumber <span aria-hidden="true">↗</span></a>
+      <div class="signature">Dibina untuk pendidik <span>oleh CikguMie</span></div>
+    </div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="breadcrumb">Ruang kreatif <span>/</span> <strong>Pembina prompt</strong></div>
+      <div class="topbar-actions"><span id="saveStatus" class="save-status" role="status">Draf setempat</span><button id="importBtn" class="btn subtle" type="button">Import JSON</button><button id="exportBtn" class="btn subtle" type="button">Eksport JSON</button><input id="importFile" type="file" accept="application/json,.json" hidden></div>
+    </header>
+    <main id="main">
+      <section class="page-heading">
+        <div><div class="eyebrow"><span></span> PEMBINA PROMPT VIDEO PENDIDIKAN</div><h1>Nota anda. Cerita luar biasa.</h1><p>Susun idea pengajaran menjadi prompt papan cerita yang lengkap.</p></div>
+        <button id="resetBtn" class="btn reset" type="button">Tetapan asal</button>
+      </section>
+      <section class="hero" aria-label="Ringkasan projek">
+        <div class="hero-copy"><span class="hero-tag">RUANG UNTUK IMAGINASI</span><h2>Setiap pelajaran<br>bermula dengan cerita.</h2><p>Anda tentukan kandungan.<br>Kembangkan dunia, watak dan gaya penceritaan.</p><div class="hero-facts"><span id="heroScenes">4 babak</span><span id="heroDuration">24 saat</span><span id="heroRatio">16:9</span></div></div>
+        <div class="hero-art" aria-hidden="true"><canvas id="sceneCanvas"></canvas><div class="frame-outline"></div><span class="art-caption">STORY → SCENE → SCREEN</span><span class="art-number">01 / STUDIO</span></div>
+      </section>
+      <section class="preset-section" aria-labelledby="presetTitle"><div class="section-heading"><h2 id="presetTitle">Mulakan dengan satu gaya</h2><span>Preset boleh disesuaikan</span></div><div id="presets" class="presets"></div></section>
+      <div class="workspace-grid">
+        <section class="settings-card" aria-labelledby="settingsTitle">
+          <div class="card-heading"><div><span class="step-label" id="stepLabel">LANGKAH 01</span><h2 id="settingsTitle">Kandungan pendidikan</h2></div><span class="card-symbol" aria-hidden="true">⌘</span></div>
+          <p id="groupDescription" class="group-description"></p>
+          <form id="settingsForm" novalidate><div id="panels"></div><div id="validationErrors" class="validation-errors" role="alert" hidden></div><div class="form-footer"><button id="prevBtn" type="button" class="btn subtle">Sebelumnya</button><button id="nextBtn" type="button" class="btn secondary">Seterusnya <span aria-hidden="true">→</span></button></div></form>
+        </section>
+        <aside class="preview-card" aria-labelledby="previewTitle">
+          <div class="preview-header"><div><div class="eyebrow">HASIL ANDA</div><h2 id="previewTitle">Pratonton prompt</h2></div><span class="live-badge"><span></span> Langsung</span></div>
+          <div class="preview-stats"><div><strong id="statScenes">4</strong><span>babak</span></div><div><strong id="statDuration">24s</strong><span>jumlah tempoh</span></div><div><strong id="statRatio">16:9</strong><span>nisbah aspek</span></div></div>
+          <div class="preview-tabs" role="tablist" aria-label="Jenis pratonton"><button id="promptTab" role="tab" aria-selected="true" aria-controls="promptPanel" type="button">Master prompt</button><button id="sceneTab" role="tab" aria-selected="false" aria-controls="scenePanel" type="button" tabindex="-1">Susunan babak</button></div>
+          <div id="promptPanel" role="tabpanel" aria-labelledby="promptTab"><div class="prompt-meta"><span id="engineBadge">Universal</span><span id="wordCount">0 perkataan</span></div><pre id="promptOutput" tabindex="0" aria-label="Teks master prompt"></pre></div>
+          <div id="scenePanel" role="tabpanel" aria-labelledby="sceneTab" hidden><div id="scenePreview" class="scene-preview"></div><p class="scene-tip">Pemetaan ini ialah arahan untuk AI. Gunakan prompt yang dibina untuk menjana cerita dan dialog.</p></div>
+          <div class="preview-actions"><button id="generateBtn" type="button" class="btn primary">Bina master prompt <span aria-hidden="true">↗</span></button><div class="export-actions"><button id="copyBtn" type="button" class="btn secondary">Salin prompt</button><button id="downloadBtn" type="button" class="btn secondary">Muat turun .txt</button></div><button id="randomBtn" type="button" class="btn random">Rawakkan gaya kreatif <span aria-hidden="true">↻</span></button><p class="preview-note">Salin ke AI pilihan anda untuk menjana papan cerita.<br>Aplikasi ini membina prompt, bukan video.</p></div>
+        </aside>
+      </div>
+      <footer class="page-footer"><span>VideoAI Studio <span class="footer-dot">·</span> Idea pengajaran, dalam format sinematik.</span><span>Versi 1.0 <span class="footer-dot">·</span> CikguMie</span></footer>
+    </main>
+  </div>
+  <div id="toast" role="status" aria-live="polite" class="toast"></div>
+  <dialog id="resetDialog"><h2>Kembali kepada tetapan asal?</h2><p>Nota, tetapan tersuai dan perubahan babak akan dikosongkan. Eksport JSON dahulu jika anda mahu menyimpannya.</p><div class="dialog-actions"><button id="cancelReset" class="btn secondary" type="button">Batal</button><button id="confirmReset" class="btn primary" type="button">Tetapkan semula</button></div></dialog>
+</body>
+</html>
